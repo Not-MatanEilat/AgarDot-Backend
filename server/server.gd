@@ -1,10 +1,10 @@
 extends Node
 
-var players = []
-
 var peer = ENetMultiplayerPeer.new()
 const PORT = 1335
 	
+var game: Game
+
 func start_server(): 
 	peer.create_server(PORT)
 	multiplayer.multiplayer_peer = peer
@@ -15,13 +15,17 @@ func start_server():
 	
 func player_connected(id):
 	print("Player: " + str(id) + " connected")
-	players.append(id)
+	game.add_player(str(id))
 	
 func player_disconnected(id):
 	print("Player: " + str(id) + " disconnected")
-	players.erase(id)
+	game.remove_player(str(id))
 	
-@rpc("call_remote")
-func add_dot(dot_data):
+func player_eat_dot(player_name, dot_id, mass):
+	add_mass.rpc_id(player_name.to_int(), mass)
+	game.delete_dot(dot_id)
+
+@rpc("call_remote", "reliable")
+func add_mass(mass_to_add):
 	pass
 
